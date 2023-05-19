@@ -1,9 +1,11 @@
+import { useGetAutoCompleteQuery } from "@/apis/getAutoComplete";
+import { useGetStationQuery } from "@/apis/getStation";
 import useDebounce from "@/hook/debounce";
 import useInputValue from "@/hook/input_value";
 import { theme } from "@/styles/theme";
 import axios from "axios";
 import { useEffect, useState } from "react";
-import styled from "styled-components";
+import styled, { keyframes } from "styled-components";
 
 const LineCardComponent = ({
   lineCode,
@@ -69,36 +71,45 @@ export default function Home() {
   const [toiletError, setToiletError] = useState<string>("");
 
   const debouncedValue = useDebounce(inputValue, 200);
+  const [searchedValue, setSearchedValue] = useState("");
 
   const [inputFocus, setInputFocus] = useState(false);
 
   //자동완성
-  const activeAutoCompleteList = async (inputValue: string) => {
-    const result = await axios.get(`/api/autocomplete/${inputValue}`);
-    setAutoCompleteArr(result.data.autoComplete);
-  };
+  const autoCompleteData = useGetAutoCompleteQuery(debouncedValue);
   useEffect(() => {
-    if (!debouncedValue) {
+    if (!autoCompleteData) {
       setAutoCompleteArr([]);
     } else {
-      activeAutoCompleteList(debouncedValue);
+      setAutoCompleteArr(autoCompleteData.data.autoComplete);
     }
-  }, [debouncedValue]);
+  }, [autoCompleteData]);
   const activeAutoComplete = (list: string) => {
     changeValue(list);
     getStationData(list);
     setAutoCompleteArr([]);
   };
-  //역 데이터 불러오기
-  const getStationData = async (inputValue: string) => {
-    setInputFocus(false);
-    const result = await axios.get(`/api/station/${inputValue}`);
-    setErrorMessage("");
-    setStationLineArr(result.data.lineNumArr);
-    setRealTime(result.data.lineData);
 
-    setToiletError("");
-    setToilet(result.data.toiletData);
+  //역 데이터 불러오기
+  const { refetch, data, isLoading, error } = useGetStationQuery(searchedValue);
+  useEffect(() => {
+    if (searchedValue) {
+      refetch();
+    }
+  }, [searchedValue]);
+  useEffect(() => {
+    if (data && searchedValue) {
+      setErrorMessage("");
+      setStationLineArr(data.data.lineNumArr);
+      setRealTime(data.data.lineData);
+
+      setToiletError("");
+      setToilet(data.data.toiletData);
+    }
+  }, [data, searchedValue]);
+  const getStationData = (inputValue: string) => {
+    setInputFocus(false);
+    setSearchedValue(inputValue);
   };
 
   return (
@@ -159,38 +170,47 @@ export default function Home() {
           </div>
         </InputSection>
         <ResultSection>
-          <article className="realTime">
-            <div className="title">실시간 도착 정보</div>
-            {!errorMessage ? (
-              <ul>
-                {stationLineArr.map((list) => {
-                  return (
-                    <LineCardComponent
-                      key={list}
-                      lineCode={list}
-                      trainList={realTime}
-                    />
-                  );
-                })}
-              </ul>
-            ) : (
-              <span>{errorMessage}</span>
-            )}
-          </article>
-          <article className="toilet">
-            <div className="title">화장실 정보</div>
-            {!toiletError ? (
-              toilet.map((list: any) => (
-                <div key={list.lineNum}>
-                  <div>{list.lineName}</div>
-                  <div>{list.location}</div>
-                  <div>{list.inAndOut}</div>
-                </div>
-              ))
-            ) : (
-              <div>{toiletError}</div>
-            )}
-          </article>
+          {searchedValue && <>{searchedValue}에 대한 검색 결과</>}
+          {isLoading && (
+            <SpinnerContainer>
+              <div className="loadingComment">로딩 중</div>
+              <div className="spinner">
+                <div className="innerCircle"></div>
+              </div>
+            </SpinnerContainer>
+          )}
+          {data && (
+            <>
+              <article className="realTime">
+                <div className="title">실시간 도착 정보</div>
+                <ul>
+                  {stationLineArr.map((list) => {
+                    return (
+                      <LineCardComponent
+                        key={list}
+                        lineCode={list}
+                        trainList={realTime}
+                      />
+                    );
+                  })}
+                </ul>
+              </article>
+              <article className="toilet">
+                <div className="title">화장실 정보</div>
+                {!toiletError ? (
+                  toilet.map((list: any) => (
+                    <div key={list.lineNum}>
+                      <div>{list.lineName}</div>
+                      <div>{list.location}</div>
+                      <div>{list.inAndOut}</div>
+                    </div>
+                  ))
+                ) : (
+                  <div>{toiletError}</div>
+                )}
+              </article>
+            </>
+          )}
         </ResultSection>
       </main>
     </Wrap>
@@ -200,7 +220,8 @@ export default function Home() {
 const Wrap = styled.div`
   color: ${theme.textColor.bright};
   background-color: ${theme.backgroundColor.bright};
-  width: 100%;
+  max-width: 500px;
+  margin: auto;
   header {
     background-color: #8d8d8d;
     width: 100%;
@@ -284,6 +305,46 @@ const ResultSection = styled.section`
     flex-wrap: wrap;
     gap: 20px;
     justify-content: center;
+  }
+`;
+
+const spinnerAnimation = keyframes`
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+
+`;
+const SpinnerContainer = styled.div`
+  width: 90vw;
+  height: 50vh;
+  margin: auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  .spinner {
+    width: 90px;
+    height: 90px;
+    border-radius: 50%;
+    background: linear-gradient(#ffffff, #616161);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: ${spinnerAnimation} 2s linear infinite;
+  }
+  .innerCircle {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background-color: white;
+  }
+  .loadingComment {
+    font-size: 20px;
+    font-weight: bold;
+    margin-bottom: 20px;
   }
 `;
 
