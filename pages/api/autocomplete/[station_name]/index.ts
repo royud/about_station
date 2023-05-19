@@ -22,7 +22,7 @@ export default async function handler(
     for (let i = 1; i < getStationData.length; i++) {
       const stationNameCell: any = getStationData[i][5];
       if (stationNameCell.includes(station_name)) {
-        autoCompleteArr.push(getStationData[i][5]);
+        autoCompleteArr.push(stationNameCell.split("(")[0]);
       }
     }
 
