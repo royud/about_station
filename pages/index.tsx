@@ -1,9 +1,9 @@
 import { useGetAutoCompleteQuery } from "@/apis/getAutoComplete";
 import { useGetStationQuery } from "@/apis/getStation";
+import ToiletComponent from "@/components/ToiletComponent";
 import useDebounce from "@/hook/debounce";
 import useInputValue from "@/hook/input_value";
 import { theme } from "@/styles/theme";
-import axios from "axios";
 import { useEffect, useState } from "react";
 import styled, { keyframes } from "styled-components";
 
@@ -195,20 +195,7 @@ export default function Home() {
                   })}
                 </ul>
               </article>
-              <article className="toilet">
-                <div className="title">화장실 정보</div>
-                {!toiletError ? (
-                  toilet.map((list: any) => (
-                    <div key={list.lineNum}>
-                      <div>{list.lineName}</div>
-                      <div>{list.location}</div>
-                      <div>{list.inAndOut}</div>
-                    </div>
-                  ))
-                ) : (
-                  <div>{toiletError}</div>
-                )}
-              </article>
+              <ToiletComponent data={toilet} />
             </>
           )}
         </ResultSection>
@@ -281,6 +268,7 @@ const InputSection = styled.section`
     padding: 0;
     border: none;
     background-color: gray;
+    cursor: pointer;
   }
   .autocomplete {
     margin: 20px;
@@ -318,7 +306,7 @@ const spinnerAnimation = keyframes`
 
 `;
 const SpinnerContainer = styled.div`
-  width: 90vw;
+  width: 100%;
   height: 50vh;
   margin: auto;
   display: flex;

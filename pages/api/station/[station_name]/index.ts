@@ -16,8 +16,10 @@ type Data = {
   toiletData: {
     lineNum: string;
     lineName: string;
-    location: string;
-    inAndOut: string;
+    lineArr: {
+      location: string;
+      inAndOut: string;
+    }[];
   }[];
 };
 
@@ -108,23 +110,31 @@ export default async function handler(
       ? toiletResult.data.body[0].lnCd
       : "호선 정보가 없습니다.";
     const lineName = String(toiletArr[i].lineName);
-    const location = toiletResult.data.body
-      ? toiletResult.data.body[0].dtlLoc
-      : "위치 정보가 없습니다.";
-    let inAndOut = toiletResult.data.body
-      ? toiletResult.data.body[0].gateInotDvNm
-      : "게이트 정보가 없습니다.";
-    if (inAndOut === "내") {
-      inAndOut = "게이트 안 쪽";
-    } else {
-      inAndOut = "게이트 바깥 쪽";
+
+    const lineList = toiletResult.data.body;
+    const lineArr = [];
+    for (let j = 0; j < lineList.length; j++) {
+      const location = toiletResult.data.body
+        ? toiletResult.data.body[j].dtlLoc
+        : "위치 정보가 없습니다.";
+      let inAndOut = toiletResult.data.body
+        ? toiletResult.data.body[j].gateInotDvNm
+        : "게이트 정보가 없습니다.";
+      if (inAndOut === "내") {
+        inAndOut = "게이트 안 쪽";
+      } else {
+        inAndOut = "게이트 바깥 쪽";
+      }
+      lineArr.push({
+        location: location,
+        inAndOut: inAndOut,
+      });
     }
 
     toiletData.push({
       lineNum: lineNum,
       lineName: lineName,
-      location: location,
-      inAndOut: inAndOut,
+      lineArr: lineArr,
     });
   }
 
