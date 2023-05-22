@@ -14,9 +14,9 @@ type Data = {
     limit: string;
   }[];
   toiletData: {
-    lineNum: string;
     lineName: string;
     lineArr: {
+      toiletId: number;
       location: string;
       inAndOut: string;
     }[];
@@ -83,60 +83,58 @@ export default async function handler(
   }
 
   // --------------------------------------------------------------------------
-  const toiletKey = process.env.NEXT_PUBLIC_TOILET_KEY;
-
-  const toiletArr = [];
-  const getStationData = await readXlsxFile(
-    `${__dirname}/../../../../../xlsx/운영기관_역사_코드정보_2023.02.22.xlsx`
+  const getSeoulStationData = await readXlsxFile(
+    `${__dirname}/../../../../../xlsx/서울교통공사_화장실_20220530.xlsx`
   );
-  for (let i = 1; i < getStationData.length; i++) {
-    if (station_name === getStationData[i][5]) {
-      const toiletObj = {
-        railOprIsttCd: getStationData[i][0],
-        lnCd: getStationData[i][2],
-        stinCd: getStationData[i][4],
-        lineName: getStationData[i][3],
-      };
-      toiletArr.push(toiletObj);
-    }
-  }
-  const toiletData = [];
-  for (let i = 0; i < toiletArr.length; i++) {
-    const toiletResult = await axios.get(
-      `${process.env.NEXT_PUBLIC_OPEN_TOILET}/stationToilet?serviceKey=${toiletKey}&format=json&railOprIsttCd=${toiletArr[i].railOprIsttCd}&lnCd=${toiletArr[i].lnCd}&stinCd=${toiletArr[i].stinCd}`
-    );
+  const getRedStationData = await readXlsxFile(
+    `${__dirname}/../../../../../xlsx/신분당선_화장실_20220630.xlsx`
+  );
+  const getNineStationData = await readXlsxFile(
+    `${__dirname}/../../../../../xlsx/서울메트로9호선_화장실_20220630.xlsx`
+  );
+  const getStationData = [
+    ...getSeoulStationData.slice(4, getSeoulStationData.length),
+    ...getRedStationData.slice(4, getRedStationData.length),
+    ...getNineStationData.slice(4, getNineStationData.length),
+  ];
 
-    const lineNum = toiletResult.data.body
-      ? toiletResult.data.body[0].lnCd
-      : "호선 정보가 없습니다.";
-    const lineName = String(toiletArr[i].lineName);
+  const toiletData: any[] = [];
+  for (let i = 0; i < getStationData.length; i++) {
+    if (getStationData[i][3] === station_name) {
+      const lineName: string = String(getStationData[i][2]);
+      const toiletId: number = Number(getStationData[i][0]);
+      const location: string = String(getStationData[i][9]);
+      const inAndOut: string = String(getStationData[i][7]);
 
-    const lineList = toiletResult.data.body;
-    const lineArr = [];
-    for (let j = 0; j < lineList.length; j++) {
-      const location = toiletResult.data.body
-        ? toiletResult.data.body[j].dtlLoc
-        : "위치 정보가 없습니다.";
-      let inAndOut = toiletResult.data.body
-        ? toiletResult.data.body[j].gateInotDvNm
-        : "게이트 정보가 없습니다.";
-      if (inAndOut === "내") {
-        inAndOut = "게이트 안 쪽";
-      } else {
-        inAndOut = "게이트 바깥 쪽";
-      }
-      lineArr.push({
+      const lineArr: any[] = [];
+
+      const toiletList = {
+        toiletId: toiletId,
         location: location,
         inAndOut: inAndOut,
-      });
-    }
+      };
 
-    toiletData.push({
-      lineNum: lineNum,
-      lineName: lineName,
-      lineArr: lineArr,
-    });
+      if (toiletData.length === 0) {
+        const lineList = {
+          lineName: lineName,
+          lineArr: lineArr,
+        };
+        lineArr.push(toiletList);
+        toiletData.push(lineList);
+      } else if (toiletData[toiletData.length - 1].lineName === lineName) {
+        toiletData[toiletData.length - 1].lineArr.push(toiletList);
+      } else {
+        const lineList = {
+          lineName: lineName,
+          lineArr: lineArr,
+        };
+        lineArr.push(toiletList);
+        toiletData.push(lineList);
+      }
+    }
   }
+
+  // --------------------------------------------------------------------------
 
   res.status(200).json({
     message: "성공했습니다.",

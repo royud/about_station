@@ -15,12 +15,24 @@ export default async function handler(
 
     const autoCompleteArr: any[] = [];
 
-    const getStationData = await readXlsxFile(
-      `${__dirname}/../../../../../xlsx/운영기관_역사_코드정보_2023.02.22.xlsx`
+    const getSeoulStationData = await readXlsxFile(
+      `${__dirname}/../../../../../xlsx/서울교통공사_화장실_20220530.xlsx`
     );
+    const getRedStationData = await readXlsxFile(
+      `${__dirname}/../../../../../xlsx/신분당선_화장실_20220630.xlsx`
+    );
+    const getNineStationData = await readXlsxFile(
+      `${__dirname}/../../../../../xlsx/서울메트로9호선_화장실_20220630.xlsx`
+    );
+    const getStationData = [
+      ...getSeoulStationData.slice(4, getSeoulStationData.length),
+      ...getRedStationData.slice(4, getRedStationData.length),
+      ...getNineStationData.slice(4, getNineStationData.length),
+    ];
 
-    for (let i = 1; i < getStationData.length; i++) {
-      const stationNameCell: any = getStationData[i][5];
+    for (let i = 0; i < getStationData.length; i++) {
+      const stationNameCell: any = getStationData[i][3];
+
       if (stationNameCell.includes(station_name)) {
         autoCompleteArr.push(stationNameCell.split("(")[0]);
       }

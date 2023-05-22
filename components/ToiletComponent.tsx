@@ -6,7 +6,7 @@ const ListCard = ({ list }: { list: any }) => {
       <div className="lineName">{list.lineName}</div>
       {list.lineArr.map((toiletList: any) => {
         return (
-          <div className="toiletList" key={toiletList.location}>
+          <div className="toiletList" key={toiletList.toiletId}>
             <div>위치 : {toiletList.location}</div>
             <div>게이트 안팎 유무 : {toiletList.inAndOut}</div>
           </div>
