@@ -1,5 +1,6 @@
-import getXlsxData from "@/xlsx/getXlsxData";
 import type { NextApiRequest, NextApiResponse } from "next";
+
+import readXlsxFile from "read-excel-file/node";
 
 type Data = {
   message: string;
@@ -19,7 +20,12 @@ export default async function handler(
 ) {
   const { station_name } = req.query;
 
-  const getStationData: any = await getXlsxData();
+  const getNineStationData = await readXlsxFile(
+    `${__dirname}/../../../../../xlsx/전국 도시광역철도 역사 화장실 현황_20220630.xlsx`
+  );
+  const getStationData = [
+    ...getNineStationData.slice(1, getNineStationData.length),
+  ];
 
   const getStationNameArr: any[] = [];
   for (let i = 0; i < getStationData.length; i++) {
