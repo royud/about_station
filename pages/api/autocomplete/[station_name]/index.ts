@@ -1,5 +1,5 @@
+import getXlsxData from "@/xlsx/getXlsxData";
 import type { NextApiRequest, NextApiResponse } from "next";
-import readXlsxFile from "read-excel-file/node";
 
 type Data = {
   message: string;
@@ -15,26 +15,13 @@ export default async function handler(
 
     const autoCompleteArr: any[] = [];
 
-    const getSeoulStationData = await readXlsxFile(
-      `${__dirname}/../../../../../xlsx/서울교통공사_화장실_20220530.xlsx`
-    );
-    const getRedStationData = await readXlsxFile(
-      `${__dirname}/../../../../../xlsx/신분당선_화장실_20220630.xlsx`
-    );
-    const getNineStationData = await readXlsxFile(
-      `${__dirname}/../../../../../xlsx/서울메트로9호선_화장실_20220630.xlsx`
-    );
-    const getStationData = [
-      ...getSeoulStationData.slice(4, getSeoulStationData.length),
-      ...getRedStationData.slice(4, getRedStationData.length),
-      ...getNineStationData.slice(4, getNineStationData.length),
-    ];
+    const getStationData = await getXlsxData();
 
     for (let i = 0; i < getStationData.length; i++) {
-      const stationNameCell: any = getStationData[i][3];
+      const stationNameCell: any = getStationData[i][2];
 
       if (stationNameCell.includes(station_name)) {
-        autoCompleteArr.push(stationNameCell.split("(")[0]);
+        autoCompleteArr.push(stationNameCell);
       }
     }
 
@@ -53,7 +40,6 @@ export default async function handler(
       })
       .filter((list, index) => autoCompleteArr.indexOf(list) === index)
       .slice(0, 5);
-
     res.status(200).json({
       message: "성공했습니다.",
       autoComplete: filteredAutoCompleteArr,

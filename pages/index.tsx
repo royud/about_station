@@ -7,68 +7,14 @@ import { theme } from "@/styles/theme";
 import { useEffect, useState } from "react";
 import styled, { keyframes } from "styled-components";
 
-const LineCardComponent = ({
-  lineCode,
-  trainList,
-}: {
-  lineCode: number;
-  trainList: any;
-}) => {
-  const filteredTrainList = trainList.filter(
-    (list: any) => list.lineNum === lineCode
-  );
-
-  const directionA = [...filteredTrainList].filter(
-    (list: any) => list.direction === filteredTrainList[0].direction
-  );
-  const directionB = [...filteredTrainList].filter(
-    (list: any) =>
-      list.direction ===
-      filteredTrainList[filteredTrainList.length - 1].direction
-  );
-
-  return (
-    <LineCard>
-      <div className="lineName">{lineCode}호선</div>
-      <div className="directionList">
-        <div className="direction">
-          <div className="listTitle">{directionA[0].direction}</div>
-          {directionA.map((list: any) => {
-            return (
-              <div key={list.trainNum} className="listBox">
-                <div>{list.destination}</div>
-                <div>{list.currentLocation}</div>
-                <div>{list.limit}</div>
-              </div>
-            );
-          })}
-        </div>
-        <div className="direction">
-          <div className="listTitle">{directionB[0].direction}</div>
-          {directionB.map((list: any) => {
-            return (
-              <div key={list.trainNum} className="listBox">
-                <div>{list.destination}</div>
-                <div>{list.currentLocation}</div>
-                <div>{list.limit}</div>
-              </div>
-            );
-          })}
-        </div>
-      </div>
-    </LineCard>
-  );
-};
 export default function Home() {
   const { inputValue, changeValue } = useInputValue();
   const [realTime, setRealTime] = useState<any[]>([]);
   const [stationLineArr, setStationLineArr] = useState<any[]>([]);
-  const [errorMessage, setErrorMessage] = useState<string>("");
 
   const [autoCompleteArr, setAutoCompleteArr] = useState<string[]>([]);
 
   const [toilet, setToilet] = useState([]);
-  const [toiletError, setToiletError] = useState<string>("");
 
   const debouncedValue = useDebounce(inputValue, 200);
   const [searchedValue, setSearchedValue] = useState("");
@@ -91,7 +37,8 @@ export default function Home() {
   };
 
   //역 데이터 불러오기
-  const { refetch, data, isLoading, error } = useGetStationQuery(searchedValue);
+  const { refetch, data, isLoading, errorMessage } =
+    useGetStationQuery(searchedValue);
   useEffect(() => {
     if (searchedValue) {
       refetch();
@@ -99,11 +46,8 @@ export default function Home() {
   }, [searchedValue]);
   useEffect(() => {
     if (data && searchedValue) {
-      setErrorMessage("");
       setStationLineArr(data.data.lineNumArr);
       setRealTime(data.data.lineData);
-
-      setToiletError("");
       setToilet(data.data.toiletData);
     }
   }, [data, searchedValue]);
@@ -170,7 +114,12 @@ export default function Home() {
           </div>
         </InputSection>
         <ResultSection>
-          {searchedValue && <>{searchedValue}에 대한 검색 결과</>}
+          {/* 검색어 표시 */}
+          {searchedValue && (
+            <EorrorMessage>{searchedValue}에 대한 검색 결과</EorrorMessage>
+          )}
+
+          {/* 로딩 */}
           {isLoading && (
             <SpinnerContainer>
               <div className="loadingComment">로딩 중</div>
@@ -179,25 +128,12 @@ export default function Home() {
               </div>
             </SpinnerContainer>
           )}
-          {data && (
-            <>
-              <article className="realTime">
-                <div className="title">실시간 도착 정보</div>
-                <ul>
-                  {stationLineArr.map((list) => {
-                    return (
-                      <LineCardComponent
-                        key={list}
-                        lineCode={list}
-                        trainList={realTime}
-                      />
-                    );
-                  })}
-                </ul>
-              </article>
-              <ToiletComponent data={toilet} />
-            </>
-          )}
+
+          {/* 에러 메세지 */}
+          {errorMessage && <div>{errorMessage}</div>}
+
+          {/* 정상 출력 */}
+          {data && <ToiletComponent data={toilet} />}
         </ResultSection>
       </main>
     </Wrap>
@@ -334,6 +270,10 @@ const SpinnerContainer = styled.div`
     font-weight: bold;
     margin-bottom: 20px;
   }
+`;
+
+const EorrorMessage = styled.div`
+  margin: 10px 0;
 `;
 
 const LineCard = styled.li`
