@@ -1,6 +1,5 @@
 import getXlsxData from "@/xlsx/getXlsxData";
 import type { NextApiRequest, NextApiResponse } from "next";
-import readXlsxFile from "read-excel-file/node";
 
 type Data = {
   message: string;
@@ -16,15 +15,7 @@ export default async function handler(
 
     const autoCompleteArr: any[] = [];
 
-    // const getStationData = await getXlsxData();
-
-    const getNineStationData = await readXlsxFile(
-      `./xlsx/전국 도시광역철도 역사 화장실 현황_20220630.xlsx`
-    );
-
-    const getStationData = [
-      ...getNineStationData.slice(1, getNineStationData.length),
-    ];
+    const getStationData = await getXlsxData();
 
     for (let i = 0; i < getStationData.length; i++) {
       const stationNameCell: any = getStationData[i][2];

@@ -8,6 +8,7 @@ export const useGetAutoCompleteQuery = (inputValue: string) => {
     queryFn: async () => await axios.get(`/api/autocomplete/${inputValue}`),
     enabled: !!inputValue,
     refetchOnWindowFocus: false,
+    retry: false,
   });
 
   return data;
