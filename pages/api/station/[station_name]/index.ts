@@ -36,7 +36,7 @@ export default async function handler(
 
   const toiletData: any[] = [];
   if (!getStationNameArr.includes(station_name)) {
-    res.status(404).json({
+    return res.status(404).json({
       message: `현재 데이터에 등록되지 않은 역 이름입니다. '${station_name}'`,
       toiletData: [],
     });
