@@ -10,6 +10,8 @@ type Data = {
       toiletId: number;
       location: string;
       inAndOut: string;
+      MaleOrFemale: string;
+      etc: string;
     }[];
   }[];
 };
@@ -45,6 +47,11 @@ export default async function handler(
       const toiletId: number = Number(getStationData[i][3]);
       const location: string = String(getStationData[i][8]);
       const inAndOut: string = String(getStationData[i][6]);
+      const MaleOrFemale: string = String(getStationData[i][9]).replace(
+        /[/]+[ ]|[/]/g,
+        "\n"
+      );
+      const etc: string = String(getStationData[i][11]);
 
       const lineArr: any[] = [];
 
@@ -52,6 +59,8 @@ export default async function handler(
         toiletId: toiletId,
         location: location,
         inAndOut: inAndOut,
+        MaleOrFemale: MaleOrFemale,
+        etc: etc,
       };
 
       if (toiletData.length === 0) {
@@ -74,7 +83,7 @@ export default async function handler(
     }
   }
   res.status(200).json({
-    message: `'${station_name}'역 검색에 성공했습니다.`,
+    message: `'${station_name}'역 검색 결과입니다.`,
     toiletData: toiletData,
   });
 }

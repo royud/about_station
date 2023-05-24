@@ -9,8 +9,6 @@ import styled, { keyframes } from "styled-components";
 
 export default function Home() {
   const { inputValue, changeValue } = useInputValue();
-  const [realTime, setRealTime] = useState<any[]>([]);
-  const [stationLineArr, setStationLineArr] = useState<any[]>([]);
 
   const [autoCompleteArr, setAutoCompleteArr] = useState<string[]>([]);
 
@@ -20,6 +18,8 @@ export default function Home() {
   const [searchedValue, setSearchedValue] = useState("");
 
   const [inputFocus, setInputFocus] = useState(false);
+
+  const [isClickButton, setIsClickButton] = useState(false);
 
   //자동완성
   const autoCompleteData = useGetAutoCompleteQuery(debouncedValue);
@@ -37,7 +37,7 @@ export default function Home() {
   };
 
   //역 데이터 불러오기
-  const { refetch, data, isLoading, errorMessage } =
+  const { refetch, data, isLoading, message } =
     useGetStationQuery(searchedValue);
   useEffect(() => {
     if (searchedValue) {
@@ -46,8 +46,6 @@ export default function Home() {
   }, [searchedValue]);
   useEffect(() => {
     if (data && searchedValue) {
-      setStationLineArr(data.data.lineNumArr);
-      setRealTime(data.data.lineData);
       setToilet(data.data.toiletData);
     }
   }, [data, searchedValue]);
@@ -62,7 +60,7 @@ export default function Home() {
         <h1>about station</h1>
       </header>
       <main>
-        <InputSection>
+        <InputSection isClickButton={isClickButton}>
           <div className="inputSectionBox">
             <div className="inputSection">
               <input
@@ -90,6 +88,12 @@ export default function Home() {
                 onClick={() => {
                   getStationData(inputValue);
                 }}
+                onMouseDown={() => {
+                  setIsClickButton(true);
+                }}
+                onMouseUp={() => {
+                  setIsClickButton(false);
+                }}
               >
                 검색
               </button>
@@ -115,9 +119,7 @@ export default function Home() {
         </InputSection>
         <ResultSection>
           {/* 검색어 표시 */}
-          {searchedValue && (
-            <EorrorMessage>{searchedValue}에 대한 검색 결과</EorrorMessage>
-          )}
+          {message && <EorrorMessage>{message}</EorrorMessage>}
 
           {/* 로딩 */}
           {isLoading && (
@@ -128,9 +130,6 @@ export default function Home() {
               </div>
             </SpinnerContainer>
           )}
-
-          {/* 에러 메세지 */}
-          {errorMessage && <div>{errorMessage}</div>}
 
           {/* 정상 출력 */}
           {data && <ToiletComponent data={toilet} />}
@@ -168,7 +167,7 @@ const Wrap = styled.div`
     margin: 10px 0;
   }
 `;
-const InputSection = styled.section`
+const InputSection = styled.section<{ isClickButton: boolean }>`
   position: relative;
   height: 40px;
   .inputSectionBox {
@@ -203,7 +202,8 @@ const InputSection = styled.section`
     margin: 0;
     padding: 0;
     border: none;
-    background-color: gray;
+    background-color: ${({ isClickButton }) =>
+      isClickButton ? "#454545" : "gray"};
     cursor: pointer;
   }
   .autocomplete {
@@ -221,14 +221,6 @@ const ResultSection = styled.section`
     margin-bottom: 10px;
     font-size: 20px;
     font-weight: bold;
-  }
-  ul {
-    width: 90%;
-    margin: auto;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 20px;
-    justify-content: center;
   }
 `;
 
@@ -274,23 +266,4 @@ const SpinnerContainer = styled.div`
 
 const EorrorMessage = styled.div`
   margin: 10px 0;
-`;
-
-const LineCard = styled.li`
-  width: 100%;
-  padding: 10px;
-  border: 1px solid black;
-  .directionList {
-    display: flex;
-  }
-  .direction {
-    width: 50%;
-  }
-  .listTitle {
-    margin-bottom: 5px;
-    font-weight: bold;
-  }
-  .listBox {
-    margin-bottom: 10px;
-  }
 `;
