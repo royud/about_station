@@ -1,5 +1,6 @@
 import { useGetAutoCompleteQuery } from "@/apis/getAutoComplete";
 import { useGetStationQuery } from "@/apis/getStation";
+import SpinnerComponent from "@/components/SpinnerComponent";
 import ToiletComponent from "@/components/ToiletComponent";
 import useDebounce from "@/hook/debounce";
 import useInputValue from "@/hook/input_value";
@@ -98,38 +99,31 @@ export default function Home() {
                 검색
               </button>
             </div>
-            {inputFocus && autoCompleteArr.length !== 0 && (
-              <ul className="autocomplete">
-                {autoCompleteArr.map((list) => {
-                  return (
-                    <li
-                      key={list}
-                      onClick={() => {
-                        activeAutoComplete(list);
-                      }}
-                      tabIndex={-1}
-                    >
-                      {list}
-                    </li>
-                  );
-                })}
-              </ul>
-            )}
           </div>
+          {inputFocus && autoCompleteArr.length !== 0 && (
+            <ul className="autocomplete">
+              {autoCompleteArr.map((list) => {
+                return (
+                  <li
+                    key={list}
+                    onClick={() => {
+                      activeAutoComplete(list);
+                    }}
+                    tabIndex={-1}
+                  >
+                    {list}
+                  </li>
+                );
+              })}
+            </ul>
+          )}
         </InputSection>
         <ResultSection>
           {/* 검색어 표시 */}
-          {message && <EorrorMessage>{message}</EorrorMessage>}
+          {message && <ApiMessage>{message}</ApiMessage>}
 
           {/* 로딩 */}
-          {isLoading && (
-            <SpinnerContainer>
-              <div className="loadingComment">로딩 중</div>
-              <div className="spinner">
-                <div className="innerCircle"></div>
-              </div>
-            </SpinnerContainer>
-          )}
+          {isLoading && <SpinnerComponent />}
 
           {/* 정상 출력 */}
           {data && <ToiletComponent data={toilet} />}
@@ -140,19 +134,19 @@ export default function Home() {
 }
 
 const Wrap = styled.div`
-  color: ${theme.textColor.bright};
-  background-color: ${theme.backgroundColor.bright};
+  color: ${theme.bright.textColor};
+  background-color: ${theme.bright.backgroundColor};
   max-width: 500px;
   margin: auto;
   header {
-    background-color: #8d8d8d;
+    background-color: ${theme.bright.pointColor};
     width: 100%;
     height: 40px;
     display: flex;
     align-items: center;
   }
   header h1 {
-    color: white;
+    color: ${theme.bright.textColor2};
     font-weight: 500;
     font-size: 17px;
     margin-left: 10px;
@@ -168,16 +162,12 @@ const Wrap = styled.div`
   }
 `;
 const InputSection = styled.section<{ isClickButton: boolean }>`
-  position: relative;
   height: 40px;
   .inputSectionBox {
     width: 100%;
-    position: absolute;
-    left: 0;
-    top: 0;
-    border: 1px solid gray;
+    border: 2px solid ${theme.bright.pointColor};
     border-radius: 25px;
-    background-color: white;
+    background-color: ${theme.bright.backgroundColor};
   }
   .inputSection {
     height: 40px;
@@ -198,16 +188,24 @@ const InputSection = styled.section<{ isClickButton: boolean }>`
   button {
     width: 100px;
     height: 100%;
-    color: white;
+    color: ${theme.bright.textColor2};
     margin: 0;
     padding: 0;
-    border: none;
+    border: 1px solid ${theme.bright.pointColor};
     background-color: ${({ isClickButton }) =>
-      isClickButton ? "#454545" : "gray"};
+      isClickButton ? theme.bright.pointColorDark : theme.bright.pointColor};
     cursor: pointer;
   }
   .autocomplete {
-    margin: 20px;
+    width: calc(100% - 100px - 20px);
+    position: relative;
+    top: 10px;
+    left: 0;
+    padding: 20px;
+    border: 2px solid ${theme.bright.pointColor};
+    border-radius: 20px;
+    background-color: ${theme.bright.backgroundColor};
+    color: ${theme.bright.textColor};
     display: flex;
     flex-direction: column;
     gap: 10px;
@@ -223,47 +221,6 @@ const ResultSection = styled.section`
     font-weight: bold;
   }
 `;
-
-const spinnerAnimation = keyframes`
-  0% {
-    transform: rotate(0deg);
-  }
-  100% {
-    transform: rotate(360deg);
-  }
-
-`;
-const SpinnerContainer = styled.div`
-  width: 100%;
-  height: 50vh;
-  margin: auto;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-direction: column;
-  .spinner {
-    width: 90px;
-    height: 90px;
-    border-radius: 50%;
-    background: linear-gradient(#ffffff, #616161);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    animation: ${spinnerAnimation} 2s linear infinite;
-  }
-  .innerCircle {
-    width: 80px;
-    height: 80px;
-    border-radius: 50%;
-    background-color: white;
-  }
-  .loadingComment {
-    font-size: 20px;
-    font-weight: bold;
-    margin-bottom: 20px;
-  }
-`;
-
-const EorrorMessage = styled.div`
+const ApiMessage = styled.div`
   margin: 10px 0;
 `;

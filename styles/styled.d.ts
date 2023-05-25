@@ -2,13 +2,12 @@ import "styled-components";
 
 declare module "styled-components" {
   export interface DefaultTheme {
-    textColor: {
-      bright: string;
-      dark: string;
-    };
-    backgroundColor: {
-      bright: string;
-      dark: string;
+    bright: {
+      backgroundColor: string;
+      textColor: string;
+      textColor2: string;
+      pointColor: string;
+      pointColorDark: string;
     };
   }
 }
