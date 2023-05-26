@@ -3,10 +3,12 @@ import type { AppProps } from "next/app";
 
 import { ThemeProvider } from "styled-components";
 import { GlobalStyle } from "../styles/global-style";
-import { theme } from "@/styles/theme";
+import { darkTheme, lightTheme } from "@/styles/theme";
 
 import { ReactQueryDevtools } from "react-query/devtools";
 import { QueryClient, QueryClientProvider } from "react-query";
+import React from "react";
+import useTheme from "@/hook/styleTheme";
 
 const client = new QueryClient({
   defaultOptions: {
@@ -16,7 +18,15 @@ const client = new QueryClient({
   },
 });
 
+const defaultValue = {
+  theme: "light",
+  changeTheme: () => {},
+};
+
+export const CustomThemeContext = React.createContext(defaultValue);
+
 export default function App({ Component, pageProps }: AppProps) {
+  const themeProps = useTheme();
   return (
     <QueryClientProvider client={client}>
       {process.env.NODE_ENV !== "production" && (
@@ -26,9 +36,13 @@ export default function App({ Component, pageProps }: AppProps) {
         <title>about station</title>
       </Head>
       <GlobalStyle />
-      <ThemeProvider theme={theme}>
-        <Component {...pageProps} />
-      </ThemeProvider>
+      <CustomThemeContext.Provider value={themeProps}>
+        <ThemeProvider
+          theme={themeProps.theme === "light" ? lightTheme : darkTheme}
+        >
+          <Component {...pageProps} />
+        </ThemeProvider>
+      </CustomThemeContext.Provider>
     </QueryClientProvider>
   );
 }

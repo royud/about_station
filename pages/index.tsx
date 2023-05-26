@@ -4,9 +4,9 @@ import SpinnerComponent from "@/components/SpinnerComponent";
 import ToiletComponent from "@/components/ToiletComponent";
 import useDebounce from "@/hook/debounce";
 import useInputValue from "@/hook/input_value";
-import { theme } from "@/styles/theme";
-import { useEffect, useState } from "react";
-import styled, { keyframes } from "styled-components";
+import { useContext, useEffect, useState } from "react";
+import styled from "styled-components";
+import { CustomThemeContext } from "./_app";
 
 export default function Home() {
   const { inputValue, changeValue } = useInputValue();
@@ -21,6 +21,9 @@ export default function Home() {
   const [inputFocus, setInputFocus] = useState(false);
 
   const [isClickButton, setIsClickButton] = useState(false);
+
+  //다크모드
+  const { theme, changeTheme } = useContext(CustomThemeContext);
 
   //자동완성
   const autoCompleteData = useGetAutoCompleteQuery(debouncedValue);
@@ -59,6 +62,7 @@ export default function Home() {
     <Wrap>
       <header>
         <h1>about station</h1>
+        <button onClick={changeTheme}>{theme}</button>
       </header>
       <main>
         <InputSection isClickButton={isClickButton}>
@@ -134,22 +138,34 @@ export default function Home() {
 }
 
 const Wrap = styled.div`
-  color: ${theme.bright.textColor};
-  background-color: ${theme.bright.backgroundColor};
+  color: ${({ theme }) => theme.color.text_main};
+  background-color: ${({ theme }) => theme.color.background_main};
+  height: 100vh;
   max-width: 500px;
   margin: auto;
   header {
-    background-color: ${theme.bright.pointColor};
+    background-color: ${({ theme }) => theme.color.background_point};
     width: 100%;
     height: 40px;
     display: flex;
     align-items: center;
+    justify-content: space-between;
   }
   header h1 {
-    color: ${theme.bright.textColor2};
-    font-weight: 500;
+    color: ${({ theme }) => theme.color.text_sub};
+    font-weight: 600;
     font-size: 17px;
     margin-left: 10px;
+  }
+  header button {
+    margin-right: 10px;
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    border: ${({ theme }) => theme.color.border_sub};
+    background-color: ${({ theme }) => theme.color.background_point};
+    font-size: 10px;
+    cursor: pointer;
   }
   main {
     margin: 10px;
@@ -165,9 +181,9 @@ const InputSection = styled.section<{ isClickButton: boolean }>`
   height: 40px;
   .inputSectionBox {
     width: 100%;
-    border: 2px solid ${theme.bright.pointColor};
+    border: ${({ theme }) => theme.color.border_point};
     border-radius: 25px;
-    background-color: ${theme.bright.backgroundColor};
+    background-color: ${({ theme }) => theme.color.background_main};
   }
   .inputSection {
     height: 40px;
@@ -184,16 +200,16 @@ const InputSection = styled.section<{ isClickButton: boolean }>`
     border: none;
     background-color: transparent;
     outline: none;
+    color: ${({ theme }) => theme.color.text_main};
   }
   button {
     width: 100px;
     height: 100%;
-    color: ${theme.bright.textColor2};
+    color: ${({ theme }) => theme.color.text_sub};
     margin: 0;
     padding: 0;
-    border: 1px solid ${theme.bright.pointColor};
-    background-color: ${({ isClickButton }) =>
-      isClickButton ? theme.bright.pointColorDark : theme.bright.pointColor};
+    border: ${({ theme }) => theme.color.border_point};
+    background-color: ${({ theme }) => theme.color.background_point};
     cursor: pointer;
   }
   .autocomplete {
@@ -202,10 +218,9 @@ const InputSection = styled.section<{ isClickButton: boolean }>`
     top: 10px;
     left: 0;
     padding: 20px;
-    border: 2px solid ${theme.bright.pointColor};
     border-radius: 20px;
-    background-color: ${theme.bright.backgroundColor};
-    color: ${theme.bright.textColor};
+    background-color: ${({ theme }) => theme.color.background_point};
+    color: ${({ theme }) => theme.color.text_sub};
     display: flex;
     flex-direction: column;
     gap: 10px;

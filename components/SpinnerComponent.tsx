@@ -32,7 +32,10 @@ const SpinnerContainer = styled.div`
     width: 90px;
     height: 90px;
     border-radius: 50%;
-    background: linear-gradient(#ffffff, #616161);
+    background: linear-gradient(
+      ${({ theme }) => theme.color.background_main},
+      ${({ theme }) => theme.color.background_point}
+    );
     display: flex;
     align-items: center;
     justify-content: center;
@@ -42,7 +45,7 @@ const SpinnerContainer = styled.div`
     width: 80px;
     height: 80px;
     border-radius: 50%;
-    background-color: white;
+    background-color: ${({ theme }) => theme.color.background_main};
   }
   .loadingComment {
     font-size: 20px;
