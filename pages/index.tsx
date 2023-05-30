@@ -7,6 +7,7 @@ import useInputValue from "@/hook/input_value";
 import { useContext, useEffect, useState } from "react";
 import styled from "styled-components";
 import { CustomThemeContext } from "./_app";
+import Link from "next/link";
 
 export default function Home() {
   const { inputValue, changeValue } = useInputValue();
@@ -61,7 +62,10 @@ export default function Home() {
   return (
     <Wrap>
       <header>
-        <h1>Toilet Gate</h1>
+        <Link href={"/"} className="headerWrap">
+          <img src="/logo.png" />
+          <h1>Toilet Gate</h1>
+        </Link>
         <button onClick={changeTheme}>{theme}</button>
       </header>
       <main>
@@ -150,6 +154,16 @@ const Wrap = styled.div`
     display: flex;
     align-items: center;
     justify-content: space-between;
+    border-radius: 0px 0px 10px 10px;
+  }
+  .headerWrap {
+    display: flex;
+    align-items: center;
+    margin-left: 10px;
+  }
+  .headerWrap img {
+    width: 30px;
+    height: 30px;
   }
   header h1 {
     color: ${({ theme }) => theme.color.text_sub};
@@ -164,6 +178,7 @@ const Wrap = styled.div`
     border-radius: 50%;
     border: ${({ theme }) => theme.color.border_sub};
     background-color: ${({ theme }) => theme.color.background_point};
+    color: ${({ theme }) => theme.color.text_sub};
     font-size: 10px;
     cursor: pointer;
   }
@@ -205,7 +220,7 @@ const InputSection = styled.section<{ isClickButton: boolean }>`
   button {
     width: 100px;
     height: 100%;
-    color: ${({ theme }) => theme.color.text_sub};
+    color: ${({ theme }) => theme.color.text_main};
     margin: 0;
     padding: 0;
     border: ${({ theme }) => theme.color.border_point};
@@ -220,7 +235,8 @@ const InputSection = styled.section<{ isClickButton: boolean }>`
     padding: 20px;
     border-radius: 20px;
     background-color: ${({ theme }) => theme.color.background_point};
-    color: ${({ theme }) => theme.color.text_sub};
+    box-shadow: 0px 0px 5px 0px black;
+    color: ${({ theme }) => theme.color.text_main};
     display: flex;
     flex-direction: column;
     gap: 10px;

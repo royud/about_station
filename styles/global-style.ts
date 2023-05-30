@@ -10,6 +10,10 @@ export const GlobalStyle = createGlobalStyle`
     list-style: none;
     padding: 0; margin: 0;
   }
+  a {
+    text-decoration: none;
+    color: inherit;
+  }
   body {
     padding: 0;
     margin: 0;

@@ -41,7 +41,11 @@ export default class MyDocument extends Document<any> {
   render() {
     return (
       <html lang="ko">
-        <Head>{/* <meta>, 웹 폰트 */}</Head>
+        <Head>
+          <meta property="og:title" content="Toilet Gate" />
+          <meta property="og:description" content="빠른 지하철 화장실 찾기" />
+          <meta property="og:image" content="/logo.png" />
+        </Head>
         <body>
           <Main />
           <NextScript />

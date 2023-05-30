@@ -42,6 +42,9 @@ export default function ToiletComponent({ data }: { data: any }) {
 const Wrap = styled.article``;
 
 const StyleCard = styled.div`
+  background-color: ${({ theme }) => theme.color.background_point};
+  padding: 10px;
+  border-radius: 10px;
   margin-bottom: 10px;
   ul {
     display: flex;
