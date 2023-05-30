@@ -33,7 +33,7 @@ export default function App({ Component, pageProps }: AppProps) {
         <ReactQueryDevtools initialIsOpen={false} />
       )}
       <Head>
-        <title>about station</title>
+        <title>Toilet Gate</title>
       </Head>
       <GlobalStyle />
       <CustomThemeContext.Provider value={themeProps}>

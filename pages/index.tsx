@@ -61,7 +61,7 @@ export default function Home() {
   return (
     <Wrap>
       <header>
-        <h1>about station</h1>
+        <h1>Toilet Gate</h1>
         <button onClick={changeTheme}>{theme}</button>
       </header>
       <main>
