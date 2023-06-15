@@ -1,6 +1,11 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 
-import readXlsxFile from "read-excel-file/node";
+import { MongoClient } from "mongodb";
+
+const mongoUrl: any = process.env.NEXT_PUBLIC_MONGODB_URL;
+
+const client = new MongoClient(mongoUrl);
+
 type Data = {
   message: string;
   autoComplete: (string | number | boolean | DateConstructor)[];
@@ -15,18 +20,14 @@ export default async function handler(
 
     const autoCompleteArr: any[] = [];
 
-    const getNineStationData = await readXlsxFile(
-      `${__dirname}/../../../../../xlsx/전국 도시광역철도 역사 화장실 현황_20220630.xlsx`
-    );
-    const getStationData = [
-      ...getNineStationData.slice(1, getNineStationData.length),
-    ];
+    const database = client.db("app_station");
+    const toilets = database.collection("toilets");
 
-    for (let i = 0; i < getStationData.length; i++) {
-      const stationNameCell: any = getStationData[i][2];
+    const list = await toilets.find().toArray();
 
-      if (stationNameCell.includes(station_name)) {
-        autoCompleteArr.push(stationNameCell);
+    for (let i = 0; i < list.length; i++) {
+      if (list[i].stationName.includes(station_name)) {
+        autoCompleteArr.push(list[i].stationName);
       }
     }
 
