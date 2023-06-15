@@ -39,13 +39,17 @@ export default function ToiletComponent({ data }: { data: any }) {
   );
 }
 
-const Wrap = styled.article``;
+const Wrap = styled.article`
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+`;
 
 const StyleCard = styled.div`
   background-color: ${({ theme }) => theme.color.background_point};
   padding: 10px;
   border-radius: 10px;
-  margin-bottom: 10px;
+
   ul {
     display: flex;
     flex-wrap: wrap;

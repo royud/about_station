@@ -144,7 +144,7 @@ export default function Home() {
 const Wrap = styled.div`
   color: ${({ theme }) => theme.color.text_main};
   background-color: ${({ theme }) => theme.color.background_main};
-  height: 100vh;
+  min-height: 100vh;
   max-width: 500px;
   margin: auto;
   header {
@@ -183,13 +183,13 @@ const Wrap = styled.div`
     cursor: pointer;
   }
   main {
-    margin: 10px;
+    margin: 10px 10px 0;
   }
   main input {
     padding: 0;
   }
   article {
-    margin: 10px 0;
+    margin: 10px 0 0;
   }
 `;
 const InputSection = styled.section<{ isClickButton: boolean }>`
